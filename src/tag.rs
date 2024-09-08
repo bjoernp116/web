@@ -1,8 +1,11 @@
 use std::iter::Product;
 
-use crate::parser::ParsedExpr;
+use crate::parser::{ParsedExpr, ParsedExprNode};
 use crate::utils::Or;
+
+#[derive(Clone, Debug)]
 pub enum TagType {
+    Html,
     Head,
     Body,
     H1,
@@ -15,8 +18,21 @@ pub enum TagType {
     Meta,
     Style,
     P,
+    Uniqe(String)
+}
+impl TagType {
+    pub fn from(input: String) -> TagType {
+        use TagType::*;
+        match input.clone().as_str() {
+            "html" => Html,
+            "head" => Head,
+            "body" => Body,
+            _ => Uniqe(input)
+        }
+    }
 }
 
+#[derive(Clone, Debug)]
 pub struct Tag {
     one_liner: bool,
     tag_type: TagType,
@@ -24,9 +40,19 @@ pub struct Tag {
     expressions: Vec<String>,
 }
 impl Tag {
-    pub fn from(input: Vec<ParsedExpr>) -> Vec<Or<Tag, String>> {
-        for expr in input {
+    pub fn from(input: ParsedExprNode) -> Tag {
+        let mut fields: Vec<Tag> = Vec::new();
+        let mut expressions: Vec<String> = Vec::new();
+        for field in input.clone().children {
+            match field {
+                Or::This(c) => fields.push(Tag::from(c)),
+                Or::That(s) => expressions.push(s)
+            }
         }
-        todo!()
+        let tag_type = TagType::from(input.name);
+        Tag {
+            one_liner: false,
+            fields, expressions, tag_type
+        }
     }
 }

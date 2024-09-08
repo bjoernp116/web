@@ -94,7 +94,7 @@ pub struct ParsedExprNode {
     pub attr: HashMap<String, String>,
     pub children: Vec<Or<ParsedExprNode, String>>,
 }
-pub fn treeify(input: Vec<ParsedExpr>) -> Vec<ParsedExprNode>{
+pub fn treeify(input: Vec<ParsedExpr>) -> ParsedExprNode {
 
     let mut stack: Vec<ParsedExprNode> = Vec::new();
     for expr in input {
@@ -112,9 +112,13 @@ pub fn treeify(input: Vec<ParsedExpr>) -> Vec<ParsedExprNode>{
                 });
             },
             ParsedExpr::ClosingTag(name, attr) => {
-
+                if stack.len() >= 2 {
+                    let l = stack.len() - 2;
+                    let node = stack.pop().unwrap();
+                    stack[l].children.push(Or::This(node));
+                }
             },
         }
     }
-    stack
+    stack[0].clone()
 }

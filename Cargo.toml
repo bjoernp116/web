@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-http = "1.1.0"
-reqwest = { version = "0.12.7", features = ["blocking"] }
+console_engine = "2.6.1"
+# reqwest = { version = "0.12.7", features = ["blocking"] }
